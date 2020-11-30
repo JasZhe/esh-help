@@ -121,7 +121,8 @@ It comes from Zsh."
       str)))
 
 (defun esh-help-eldoc-man-minibuffer-string (cmd)
-  "Return minibuffer help string for the shell command CMD."
+  "Return minibuffer help string for the shell command CMD.
+Return nil if there is none."
   (let ((cache-result (gethash cmd esh-help-man-cache)))
     (if cache-result
         (unless (eql 'none cache-result)
@@ -133,12 +134,12 @@ It comes from Zsh."
               (puthash cmd 'none esh-help-man-cache)
               nil)
           (puthash cmd
-                   (->> str
-                        (--drop-while (not (string-match-p "^SYNOPSIS$" it)))
-                        (nth 1)
-                        (funcall (lambda (s)
-                                   (let ((idx (string-match "[^\s\t]" s)))
-                                     (substring s idx)))))
+                   (-some->> str
+                     (--drop-while (not (string-match-p "^SYNOPSIS$" it)))
+                     (nth 1)
+                     (funcall (lambda (s)
+                                (let ((idx (string-match "[^\s\t]" s)))
+                                  (substring s idx)))))
                    esh-help-man-cache))))))
 
 (defun esh-help-eldoc-command ()
