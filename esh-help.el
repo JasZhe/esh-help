@@ -135,7 +135,9 @@ Return nil if there is none."
               nil)
           (puthash cmd
                    (-some->> str
-                     (--drop-while (not (string-match-p "^SYNOPSIS$" it)))
+                     (--drop-while
+                      (let ((case-fold-search t))
+                        (not (string-match-p "^[[:space:]]*synopsis$" it))))
                      (nth 1)
                      (funcall (lambda (s)
                                 (let ((idx (string-match "[^\s\t]" s)))
